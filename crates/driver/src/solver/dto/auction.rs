@@ -1,9 +1,9 @@
 use {
     crate::{logic::competition, util::serialize},
-    ethereum_types::{H160, U256},
+    primitive_types::{H160, U256},
     serde::Serialize,
     serde_with::serde_as,
-    std::collections::{BTreeMap, HashMap},
+    std::collections::HashMap,
 };
 
 // TODO Since building the auction will also require liquidity later down the
@@ -18,64 +18,68 @@ impl Auction {
     }
 }
 
+#[serde_as]
 #[derive(Debug, Serialize)]
 pub struct Auction {
+    id: Option<String>,
     tokens: HashMap<H160, Token>,
-    orders: HashMap<usize, Order>,
-    amms: BTreeMap<H160, Amm>,
-    metadata: Option<Metadata>,
+    orders: Vec<Order>,
+    liquidity: Vec<Liquidity>,
+    #[serde_as(as = "serialize::U256")]
+    effective_gas_price: U256,
+    deadline: chrono::DateTime<chrono::Utc>,
 }
 
 #[serde_as]
 #[derive(Debug, Serialize)]
 struct Order {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    id: Option<String>,
+    #[serde_as(as = "serialize::Hex")]
+    uid: [u8; 56],
     sell_token: H160,
     buy_token: H160,
     #[serde_as(as = "serialize::U256")]
     sell_amount: U256,
     #[serde_as(as = "serialize::U256")]
     buy_amount: U256,
-    allow_partial_fill: bool,
-    is_sell_order: bool,
-    fee: TokenAmount,
-    cost: TokenAmount,
-    is_liquidity_order: bool,
-    is_mature: bool,
-    mandatory: bool,
-    has_atomic_execution: bool,
+    #[serde_as(as = "serialize::U256")]
+    fee_amount: U256,
+    kind: Kind,
+    partially_fillable: bool,
+    class: Class,
     reward: f64,
 }
 
-#[serde_as]
 #[derive(Debug, Serialize)]
-struct TokenAmount {
-    #[serde_as(as = "serialize::U256")]
-    amount: U256,
-    token: H160,
+#[serde(rename_all = "lowercase")]
+enum Kind {
+    Sell,
+    Buy,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "lowercase")]
+enum Class {
+    Market,
+    Limit,
+    Liquidity,
 }
 
 #[serde_as]
 #[derive(Debug, Serialize)]
 struct Token {
     decimals: Option<u8>,
-    alias: Option<String>,
-    external_price: Option<f64>,
-    normalize_priority: Option<u64>,
-    #[serde_as(as = "Option<serialize::U256>")]
-    internal_buffer: Option<U256>,
-    accepted_for_internalization: bool,
+    symbol: Option<String>,
+    reference_price: Option<f64>,
+    #[serde_as(as = "serialize::U256")]
+    available_balance: U256,
+    trusted: bool,
 }
 
+#[serde_as]
 #[derive(Debug, Serialize)]
-struct Amm {}
-
-#[derive(Debug, Serialize)]
-struct Metadata {
-    environment: Option<String>,
-    auction_id: Option<i64>,
-    run_id: Option<u64>,
-    gas_price: Option<f64>,
-    native_token: Option<H160>,
+struct Liquidity {
+    id: String,
+    address: H160,
+    #[serde_as(as = "serialize::U256")]
+    gas_estimate: U256,
 }
