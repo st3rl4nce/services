@@ -90,7 +90,6 @@ struct Order {
     kind: Kind,
     partially_fillable: bool,
     class: Class,
-    // TODO Ask if these f64s should be BigRationals
     reward: f64,
 }
 
@@ -190,7 +189,6 @@ struct StablePool {
 struct StableReserve {
     #[serde_as(as = "serialize::U256")]
     balance: U256,
-    // TODO OpenAPI wants this to be a BigInt, why? Can this be negative?
     #[serde_as(as = "serialize::U256")]
     scaling_factor: U256,
 }
@@ -204,12 +202,10 @@ struct ConcentratedLiquidityPool {
     #[serde_as(as = "serialize::U256")]
     gas_estimate: U256,
     tokens: Vec<H160>,
-    // TODO OpenAPI wants this to be a BigInt, why? Can this be negative?
     #[serde_as(as = "serialize::U256")]
     sqrt_price: U256,
     #[serde_as(as = "serialize::U256")]
     liquidity: U256,
-    // TODO OpenAPI wants this to be a BigInt, why? Can this be negative?
     #[serde_as(as = "serialize::U256")]
     tick: U256,
     #[serde_as(as = "HashMap<_, serialize::U256>")]
@@ -233,8 +229,6 @@ struct ForeignLimitOrder {
     maker_amount: U256,
     #[serde_as(as = "serialize::U256")]
     taker_amount: U256,
-    // TODO I've noticed that sometimes we say simply "fee" and sometimes we say "feeAmount", can
-    // we settle on always saying only "fee"?
     #[serde_as(as = "serialize::U256")]
     taker_token_fee_amount: U256,
 }

@@ -72,15 +72,10 @@ impl From<SolverDeadline> for chrono::DateTime<chrono::Utc> {
 impl Deadline {
     pub fn for_solver(&self) -> Result<SolverDeadline, DeadlineExceeded> {
         let timeout = self.0 - chrono::Utc::now() - Self::time_buffer();
-        if timeout <= chrono::Duration::zero() {
-            Err(DeadlineExceeded)
-        } else {
-            Ok(SolverDeadline(
-                timeout
-                    .to_std()
-                    .expect("already checked that the duration is positive"),
-            ))
-        }
+        timeout
+            .to_std()
+            .map(SolverDeadline)
+            .map_err(|_| DeadlineExceeded)
     }
 
     fn time_buffer() -> chrono::Duration {

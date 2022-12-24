@@ -270,7 +270,7 @@ async fn to_boundary_solution(
                         },
                         cost: None,
                         fee: Some(to_token_amount(
-                            fulfillment.order.fee.solver.to_asset(&fulfillment.order),
+                            &fulfillment.order.fee.solver.to_asset(&fulfillment.order),
                         )),
                         exec_plan: Some(ExecutionPlan {
                             coordinates: ExecutionPlanCoordinatesModel {
@@ -391,22 +391,8 @@ async fn to_boundary_solution(
                     target: interaction.target.into(),
                     value: interaction.value.into(),
                     call_data: interaction.call_data.clone(),
-                    inputs: interaction
-                        .inputs
-                        .iter()
-                        .map(|input| TokenAmount {
-                            amount: input.amount,
-                            token: input.token.into(),
-                        })
-                        .collect(),
-                    outputs: interaction
-                        .outputs
-                        .iter()
-                        .map(|output| TokenAmount {
-                            amount: output.amount,
-                            token: output.token.into(),
-                        })
-                        .collect(),
+                    inputs: interaction.inputs.iter().map(to_token_amount).collect(),
+                    outputs: interaction.outputs.iter().map(to_token_amount).collect(),
                     exec_plan: ExecutionPlan {
                         coordinates: ExecutionPlanCoordinatesModel {
                             sequence: 0,
@@ -424,7 +410,7 @@ async fn to_boundary_solution(
     })
 }
 
-fn to_token_amount(asset: eth::Asset) -> TokenAmount {
+fn to_token_amount(asset: &eth::Asset) -> TokenAmount {
     TokenAmount {
         amount: asset.amount,
         token: asset.token.into(),

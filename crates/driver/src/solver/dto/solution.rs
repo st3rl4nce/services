@@ -198,6 +198,7 @@ enum Trade {
 
 #[serde_as]
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Fulfillment {
     #[serde_as(as = "serialize::Hex")]
     order: [u8; 56],
