@@ -100,7 +100,11 @@ impl Settlement {
                 auction
                     .tokens
                     .iter()
-                    .map(|token| (token.address.into(), token.price.into()))
+                    .filter_map(|token| {
+                        token
+                            .price
+                            .map(|price| (token.address.into(), price.into()))
+                    })
                     .collect(),
             )?),
             &DomainSeparator(domain.0),
@@ -150,7 +154,11 @@ impl Settlement {
             auction
                 .tokens
                 .iter()
-                .map(|token| (token.address.into(), token.price.into()))
+                .filter_map(|token| {
+                    token
+                        .price
+                        .map(|price| (token.address.into(), price.into()))
+                })
                 .collect(),
         )?;
         let surplus = self.settlement.total_surplus(&prices);

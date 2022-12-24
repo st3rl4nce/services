@@ -89,7 +89,7 @@ impl Solver {
 
     pub async fn solve(&self, auction: &Auction) -> Result<Solution, Error> {
         let solver_deadline = auction.deadline.for_solver()?;
-        let body = serde_json::to_string(&dto::Auction::new(auction, &solver_deadline)).unwrap();
+        let body = serde_json::to_string(&dto::Auction::new(auction, solver_deadline)).unwrap();
         tracing::trace!(%self.config.url, %body, "sending request to solver");
         let req = self
             .client

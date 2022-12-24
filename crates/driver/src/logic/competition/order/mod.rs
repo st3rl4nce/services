@@ -38,6 +38,9 @@ pub struct Order {
     pub sell_token_balance: SellTokenBalance,
     pub buy_token_balance: BuyTokenBalance,
     pub signature: Signature,
+    /// The reward that will be received by the solver denominated in CoW
+    /// tokens.
+    pub reward: f64,
 }
 
 /// An amount denominated in the sell token of an [`Order`].
