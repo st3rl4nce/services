@@ -34,6 +34,7 @@ async-trait = "0.1"
 itertools = "0.10"
 url = "2.3"
 ethabi = "18.0"
+rand = "0.8"
 
 # These still use { workspace = true } because they're used at
 # the boundary between driver and shared.
@@ -54,7 +55,6 @@ solver = { path = "../solver" }
 tracing = { workspace = true }
 warp = { workspace = true }
 web3 = { workspace = true }
-rand.workspace = true
 
 [dev-dependencies]
 maplit = { workspace = true }
