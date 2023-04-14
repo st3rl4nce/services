@@ -273,7 +273,10 @@ impl FromStr for ExternalSolverArg {
         Ok(Self {
             name: name.to_string(),
             url: url.parse().context("parse url")?,
-            account: account.parse().context("parse account")?,
+            // map_err because default error includes the raw argument which could leak a private key
+            account: account
+                .parse()
+                .map_err(|_| anyhow!("parsing account failed"))?,
             use_liquidity: use_liquidity.parse().context("parse use_liquidity")?,
         })
     }
