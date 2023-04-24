@@ -49,6 +49,7 @@ use {
             DefaultHttpSolverApi,
             SolverConfig,
         },
+        rabbit_mq_wrapper::RabbitMQWrapper,
         token_info::TokenInfoFetching,
         token_list::AutoUpdatingTokenList,
         zeroex_api::ZeroExApi,
@@ -344,6 +345,7 @@ pub fn create(
     domain: &DomainSeparator,
     s3_instance_uploader: Option<Arc<S3InstanceUploader>>,
     score_configuration: &score_computation::Arguments,
+    rabbit: Arc<RabbitMQWrapper>,
 ) -> Result<Solvers> {
     // Tiny helper function to help out with type inference. Otherwise, all
     // `Box::new(...)` expressions would have to be cast `as Box<dyn Solver>`.
@@ -390,6 +392,7 @@ pub fn create(
                 client: http_factory.create(),
                 gzip_requests: false,
                 config,
+                rabbit: rabbit.clone(),
             },
             account,
             allowance_manager.clone(),

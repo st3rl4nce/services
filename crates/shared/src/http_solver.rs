@@ -1,15 +1,14 @@
 use {
-    crate::http_client::response_body_with_size_limit,
+    crate::rabbit_mq_wrapper::RabbitMQWrapper,
     ::model::auction::AuctionId,
     anyhow::{anyhow, Context},
     reqwest::{
         header::{self, HeaderValue},
         Client,
-        StatusCode,
         Url,
     },
     serde_json::json,
-    std::time::Duration,
+    std::{sync::Arc, time::Duration},
     tracing::Instrument,
 };
 
@@ -74,6 +73,8 @@ pub struct DefaultHttpSolverApi {
 
     /// Other solver parameters.
     pub config: SolverConfig,
+
+    pub rabbit: Arc<RabbitMQWrapper>,
 }
 
 /// Configuration for solver requests.
@@ -182,28 +183,28 @@ impl HttpSolverApi for DefaultHttpSolverApi {
             let body = serde_json::to_vec(&model).unwrap();
             request = request.body(body);
         };
-        let mut response = request.send().await.context("failed to send request")?;
-        let status = response.status();
-        let response_body =
-            response_body_with_size_limit(&mut response, SOLVER_RESPONSE_SIZE_LIMIT)
-                .await
-                .context("response body")?;
-        let text = std::str::from_utf8(&response_body).context("failed to decode response body")?;
-        tracing::trace!(body = %text, "response");
-        let context = || format!("request query {query}, response body {text}");
-        if status == StatusCode::TOO_MANY_REQUESTS {
+        let response = self.rabbit.send(request.build().unwrap()).await.unwrap();
+        // let mut response = request.send().await.context("failed to send request")?;
+        // let response_body =
+        //     response_body_with_size_limit(&mut response, SOLVER_RESPONSE_SIZE_LIMIT)
+        //         .await
+        //         .context("response body")?;
+        // let text = std::str::from_utf8(&response_body).context("failed to decode
+        // response body")?; tracing::trace!(body = %text, "response");
+        let context = || format!("request query {query:?}, response {:?}", response.body);
+        if response.status == 429 {
             return Err(Error::RateLimited);
         }
-        if !status.is_success() {
+        if !(200..=299).contains(&response.status.into()) {
             return Err(anyhow!(
                 "solver response is not success: status {}, {}",
-                status,
+                response.status,
                 context()
             )
             .into());
         }
-        serde_json::from_str(text)
-            .with_context(|| format!("failed to decode response json, {}", context()))
+        serde_json::from_value(response.body)
+            .context("failed to deserialize the rabbit mq response")
             .map_err(Into::into)
     }
 
@@ -372,6 +373,7 @@ mod tests {
             client: Default::default(),
             gzip_requests: false,
             config: Default::default(),
+            rabbit: Arc::new(RabbitMQWrapper::default().await.unwrap()),
         };
         // The default reqwest::Client supports gzip responses if the corresponding
         // crate feature is enabled.

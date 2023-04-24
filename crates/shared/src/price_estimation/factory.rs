@@ -29,6 +29,7 @@ use {
         http_solver::{DefaultHttpSolverApi, Objective, SolverConfig},
         oneinch_api::OneInchClient,
         paraswap_api::DefaultParaswapApi,
+        rabbit_mq_wrapper::RabbitMQWrapper,
         rate_limiter::RateLimiter,
         sources::{
             balancer_v2::BalancerPoolFetching,
@@ -87,6 +88,7 @@ pub struct Components {
     pub gas_price: Arc<dyn GasPriceEstimating>,
     pub zeroex: Arc<dyn ZeroExApi>,
     pub oneinch: Option<Arc<dyn OneInchClient>>,
+    pub rabbit: Arc<RabbitMQWrapper>,
 }
 
 impl<'a> PriceEstimatorFactory<'a> {
@@ -538,6 +540,7 @@ impl PriceEstimatorCreating for HttpPriceEstimator {
                     objective: Some(Objective::SurplusFeesCosts),
                     ..Default::default()
                 },
+                rabbit: factory.components.rabbit.clone(),
             }),
             factory.components.uniswap_v2_pools.clone(),
             factory.components.balancer_pools.clone(),

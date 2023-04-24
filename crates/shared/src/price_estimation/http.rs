@@ -424,6 +424,7 @@ mod tests {
                 SolverConfig,
             },
             price_estimation::Query,
+            rabbit_mq_wrapper::RabbitMQWrapper,
             recent_block_cache::CacheConfig,
             sources::{
                 balancer_v2::{
@@ -795,6 +796,7 @@ mod tests {
                     use_internal_buffers: Some(true),
                     ..Default::default()
                 },
+                rabbit: Arc::new(RabbitMQWrapper::default().await.unwrap()),
             }),
             sharing: Default::default(),
             pools,

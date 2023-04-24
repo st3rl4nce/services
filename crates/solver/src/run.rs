@@ -49,6 +49,7 @@ use {
         maintenance::{Maintaining, ServiceMaintenance},
         metrics::serve_metrics,
         network::network_name,
+        rabbit_mq_wrapper::RabbitMQWrapper,
         recent_block_cache::CacheConfig,
         sources::{
             self,
@@ -343,6 +344,7 @@ pub async fn run(args: Arguments) {
         &domain,
         s3_instance_uploader,
         &args.score_params,
+        Arc::new(RabbitMQWrapper::default().await.unwrap()),
     )
     .expect("failure creating solvers");
 

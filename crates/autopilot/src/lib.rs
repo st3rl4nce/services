@@ -1,4 +1,7 @@
-use shared::token_list::{AutoUpdatingTokenList, TokenListConfiguration};
+use shared::{
+    rabbit_mq_wrapper::RabbitMQWrapper,
+    token_list::{AutoUpdatingTokenList, TokenListConfiguration},
+};
 
 pub mod arguments;
 pub mod database;
@@ -388,6 +391,7 @@ pub async fn main(args: arguments::Arguments) {
             gas_price: gas_price_estimator.clone(),
             zeroex: zeroex_api.clone(),
             oneinch: one_inch_api.ok().map(|a| a as _),
+            rabbit: Arc::new(RabbitMQWrapper::default().await.unwrap()),
         },
     )
     .expect("failed to initialize price estimator factory");

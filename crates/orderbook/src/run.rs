@@ -45,6 +45,7 @@ use {
             factory::{self, PriceEstimatorFactory},
             PriceEstimating,
         },
+        rabbit_mq_wrapper::RabbitMQWrapper,
         recent_block_cache::CacheConfig,
         signature_validator::Web3SignatureValidator,
         sources::{
@@ -347,6 +348,7 @@ pub async fn run(args: Arguments) {
             gas_price: gas_price_estimator.clone(),
             zeroex: zeroex_api.clone(),
             oneinch: one_inch_api.ok().map(|a| a as _),
+            rabbit: Arc::new(RabbitMQWrapper::default().await.unwrap()),
         },
     )
     .expect("failed to initialize price estimator factory");

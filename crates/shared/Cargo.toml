@@ -29,6 +29,7 @@ global-metrics = { path = "../global-metrics" }
 hex = { workspace = true }
 hex-literal = { workspace = true }
 itertools = { workspace = true }
+lapin = "2"
 lazy_static = { workspace = true }
 lru = "0.8"
 maplit = { workspace = true }
@@ -39,6 +40,7 @@ number-conversions = { path = "../number-conversions" }
 primitive-types = { workspace = true }
 prometheus = { workspace = true }
 prometheus-metric-storage = { workspace = true }
+rand = { workspace = true }
 reqwest = { workspace = true, features = ["cookies", "gzip", "json"] }
 scopeguard = "1"
 secp256k1 = { workspace = true }
