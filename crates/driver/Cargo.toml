@@ -52,6 +52,7 @@ secp256k1 = { workspace = true }
 # TODO These either need to be removed or changed to be direct
 # dependencies rather than workspace dependencies
 anyhow = { workspace = true }
+# TODO I think I can switch this immediately
 clap = { workspace = true }
 contracts = { path = "../contracts" }
 ethcontract = { workspace = true }

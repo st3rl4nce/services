@@ -531,7 +531,7 @@ impl DefaultZeroExApi {
                 .map_err(ZeroExResponseError::TextFetch)?;
             tracing::trace!("Response from 0x API: {}", response_text);
 
-            if status == StatusCode::TOO_MANY_REQUESTS {
+            if dbg!(status) == StatusCode::TOO_MANY_REQUESTS {
                 return Err(ZeroExResponseError::RateLimited);
             }
 

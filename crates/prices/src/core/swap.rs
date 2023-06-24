@@ -66,6 +66,12 @@ impl From<eth::U256> for FromAmount {
     }
 }
 
+impl From<eth::Ether> for FromAmount {
+    fn from(value: eth::Ether) -> Self {
+        Self(value.0)
+    }
+}
+
 /// Amount of [`ToToken`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ToAmount(eth::U256);
